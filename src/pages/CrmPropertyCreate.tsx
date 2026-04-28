@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { ArrowLeft, Check, ChevronRight, FileImage, FileText, ImagePlus, Loader2, Save, UploadCloud, X } from 'lucide-react'
 import { api } from '@/hooks/useApi'
+import { parsePropertyDescription } from '@/lib/property-display'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -400,6 +401,8 @@ function buildDescription(form: FormState, visibility: Record<string, boolean>) 
 
 export default function CrmPropertyCreate() {
   const navigate = useNavigate()
+  const { id } = useParams()
+  const isEditMode = !!id
   const [form, setForm] = useState<FormState>(defaultFormState)
   const [galleryFiles, setGalleryFiles] = useState<File[]>([])
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
@@ -442,6 +445,60 @@ export default function CrmPropertyCreate() {
       setForm((current) => ({ ...current, listingPurpose: 'sale' }))
     }
   }, [form.propertyGroup, form.listingPurpose])
+
+  useEffect(() => {
+    if (isEditMode && id) {
+      setSaveMessage('Loading property details...')
+      api.getProperty(Number(id)).then(property => {
+        const { rawDescription, metadata } = parsePropertyDescription(property.description || '')
+        
+        const pg = (metadata['property group']?.toLowerCase().replace(' ', '_') as PropertyGroup) || 
+                   (property.property_type === 'commercial' ? 'commercial' : property.property_type === 'land' ? 'land_plot' : 'residential')
+                   
+        const newForm: FormState = {
+          ...defaultFormState,
+          id: String(property.id),
+          action: 'update',
+          title: property.title,
+          propertyGroup: pg,
+          listingPurpose: (metadata['listing purpose']?.toLowerCase() as ListingPurpose) || (property.status === 'for_sale' ? 'sale' : 'rent'),
+          specificType: metadata['specific type'] || SPECIFIC_TYPE_OPTIONS[pg]?.[0] || 'Apartment/Flat',
+          address: property.address || '',
+          city: property.city || '',
+          state: property.state || '',
+          pincode: property.zip_code || '',
+          description: rawDescription,
+          bathrooms: property.bathrooms ? String(property.bathrooms) : '',
+          builtUpArea: property.square_feet ? String(property.square_feet) : '',
+          totalArea: property.square_feet ? String(property.square_feet) : '',
+          expectedPrice: property.price ? String(property.price) : '',
+          totalPrice: property.price ? String(property.price) : '',
+          expectedMonthlyRent: property.price ? String(property.price) : '',
+          monthlyRent: property.price ? String(property.price) : '',
+          transactionType: (metadata['transaction type']?.toLowerCase().replace(' ', '_') as 'new_property'|'resale') || 'new_property',
+          buildingType: (metadata['building type']?.toLowerCase().replace(' ', '_') as BuildingType) || 'society',
+          configuration: metadata['configuration'] || (property.bedrooms ? `${property.bedrooms} BHK` : '2 BHK'),
+          constructionStatus: (metadata['construction status']?.toLowerCase().replace(' ', '_') as 'ready_to_move'|'under_construction') || 'ready_to_move',
+          videoTourUrl: metadata['video tour'] || '',
+          specialFeatures: property.amenities || []
+        }
+        
+        if (property.featured_image) {
+          const imgs = [property.featured_image]
+          if (property.images && Array.isArray(property.images)) {
+             property.images.forEach((img: string) => { if (img !== property.featured_image) imgs.push(img) })
+          }
+          setGalleryPreviews(imgs)
+        }
+        
+        setForm(newForm)
+        setSaveMessage('Ready to update this listing.')
+      }).catch(err => {
+        toast.error('Failed to load property details')
+        navigate('/crm/listings')
+      })
+    }
+  }, [id, isEditMode, navigate])
 
   const visibility = useMemo(() => {
     const isResidential = form.propertyGroup === 'residential'
@@ -642,15 +699,19 @@ export default function CrmPropertyCreate() {
     }
 
     setSaveState('saving')
-    setSaveMessage('Saving property and uploading attachments...')
+    setSaveMessage(isEditMode ? 'Updating property and attachments...' : 'Saving property and uploading attachments...')
 
     try {
-      await api.createProperty(multipart)
+      if (isEditMode && form.id) {
+        await api.updateProperty(Number(form.id), multipart)
+      } else {
+        await api.createProperty(multipart)
+      }
       const timestamp = new Date().toLocaleString()
       setSaveState('success')
-      setSaveMessage('Property saved successfully.')
+      setSaveMessage(isEditMode ? 'Property updated successfully.' : 'Property saved successfully.')
       setLastSavedAt(timestamp)
-      toast.success('Property created successfully.')
+      toast.success(isEditMode ? 'Property updated successfully.' : 'Property created successfully.')
       navigate('/crm/listings')
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to save property.'
@@ -669,11 +730,11 @@ export default function CrmPropertyCreate() {
             Back to listings
           </Link>
           <ChevronRight className="h-4 w-4" />
-          <span>Add property</span>
+          <span>{isEditMode ? 'Edit property' : 'Add property'}</span>
         </div>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Add Property</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{isEditMode ? 'Edit Property' : 'Add Property'}</h1>
             <p className="max-w-3xl text-sm leading-6 text-slate-500">
               Create a polished listing entry with the classification, compliance, pricing, and media details your team needs to publish confidently.
             </p>

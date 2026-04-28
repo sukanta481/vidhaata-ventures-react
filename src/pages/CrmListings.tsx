@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+// Dialog removed
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Search, Plus, Edit, Trash2, Bed, Bath, Square, MapPin } from 'lucide-react'
 import { toast } from 'sonner'
 import { api } from '@/hooks/useApi'
+import { formatINR, formatBathrooms } from '@/lib/property-display'
 
 interface Property {
   id: number
@@ -45,13 +46,7 @@ export default function CrmListings() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [isLoading, setIsLoading] = useState(true)
-  const [showAddDialog, setShowAddDialog] = useState(false)
-  const [editingProperty, setEditingProperty] = useState<Property | null>(null)
-  const [formData, setFormData] = useState({
-    title: '', description: '', property_type: 'house', status: 'for_sale',
-    price: '', bedrooms: '', bathrooms: '', square_feet: '',
-    address: '', city: '', state: '', amenities: ''
-  })
+  const navigate = useNavigate()
 
   const filtered = properties.filter(p => {
     const q = search.toLowerCase()
@@ -87,76 +82,7 @@ export default function CrmListings() {
     return colors[status] || 'bg-slate-100 text-slate-700'
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (editingProperty) {
-      void (async () => {
-        try {
-          await api.updateProperty(editingProperty.id, {
-            title: formData.title,
-            description: formData.description,
-            propertyType: formData.property_type,
-            status: formData.status,
-            price: Number(formData.price),
-            bedrooms: Number(formData.bedrooms),
-            bathrooms: Number(formData.bathrooms),
-            squareFeet: Number(formData.square_feet),
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            amenities: formData.amenities.split(',').map(s => s.trim()).filter(Boolean),
-            isPublished: 1,
-          })
-
-          setProperties(prev => prev.map(p => p.id === editingProperty.id ? {
-            ...p,
-            title: formData.title,
-            description: formData.description,
-            property_type: formData.property_type,
-            status: formData.status,
-            price: Number(formData.price),
-            bedrooms: Number(formData.bedrooms),
-            bathrooms: Number(formData.bathrooms),
-            square_feet: Number(formData.square_feet),
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            amenities: formData.amenities.split(',').map(s => s.trim()).filter(Boolean)
-          } : p))
-          toast.success('Property updated')
-          setShowAddDialog(false)
-          setEditingProperty(null)
-          setFormData({ title: '', description: '', property_type: 'house', status: 'for_sale', price: '', bedrooms: '', bathrooms: '', square_feet: '', address: '', city: '', state: '', amenities: '' })
-        } catch (error) {
-          toast.error(error instanceof Error ? error.message : 'Failed to update property')
-        }
-      })()
-    } else {
-      const newProperty: Property = {
-        id: Date.now(),
-        title: formData.title,
-        description: formData.description,
-        property_type: formData.property_type,
-        status: formData.status,
-        price: Number(formData.price),
-        bedrooms: Number(formData.bedrooms),
-        bathrooms: Number(formData.bathrooms),
-        square_feet: Number(formData.square_feet),
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        featured_image: '/images/hero-bg.jpg',
-        amenities: formData.amenities.split(',').map(s => s.trim()).filter(Boolean),
-        is_featured: 0,
-        is_published: 1
-      }
-      setProperties(prev => [newProperty, ...prev])
-      toast.success('Property created')
-      setShowAddDialog(false)
-      setEditingProperty(null)
-      setFormData({ title: '', description: '', property_type: 'house', status: 'for_sale', price: '', bedrooms: '', bathrooms: '', square_feet: '', address: '', city: '', state: '', amenities: '' })
-    }
-  }
+// handleSubmit removed
 
   const handleDelete = (id: number) => {
     void (async () => {
@@ -171,22 +97,7 @@ export default function CrmListings() {
   }
 
   const openEdit = (property: Property) => {
-    setEditingProperty(property)
-    setFormData({
-      title: property.title,
-      description: property.description,
-      property_type: property.property_type,
-      status: property.status,
-      price: String(property.price),
-      bedrooms: String(property.bedrooms),
-      bathrooms: String(property.bathrooms),
-      square_feet: String(property.square_feet),
-      address: property.address,
-      city: property.city,
-      state: property.state,
-      amenities: property.amenities.join(', ')
-    })
-    setShowAddDialog(true)
+    navigate(`/crm/listings/edit/${property.id}`)
   }
 
   return (
@@ -239,7 +150,7 @@ export default function CrmListings() {
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-semibold text-slate-900 truncate pr-2">{property.title}</h3>
-                <p className="text-emerald-600 font-bold">₹{property.price.toLocaleString('en-IN')}</p>
+                <p className="text-emerald-600 font-bold">{formatINR(property.price, property.status)}</p>
               </div>
               <div className="flex items-center gap-1 text-sm text-slate-500 mb-3">
                 <MapPin className="h-3 w-3" />
@@ -247,7 +158,7 @@ export default function CrmListings() {
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-500 mb-3">
                 {property.bedrooms > 0 && <span className="flex items-center gap-1"><Bed className="h-3 w-3" /> {property.bedrooms}</span>}
-                <span className="flex items-center gap-1"><Bath className="h-3 w-3" /> {property.bathrooms}</span>
+                <span className="flex items-center gap-1"><Bath className="h-3 w-3" /> {formatBathrooms(property.bathrooms)}</span>
                 <span className="flex items-center gap-1"><Square className="h-3 w-3" /> {property.square_feet?.toLocaleString()}</span>
               </div>
               <div className="flex gap-2">
@@ -272,90 +183,7 @@ export default function CrmListings() {
         </div>
       )}
 
-      {/* Add/Edit Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingProperty ? 'Edit Property' : 'Add New Property'}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <Label>Title *</Label>
-                <Input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
-              </div>
-              <div className="col-span-2">
-                <Label>Description</Label>
-                <Textarea rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
-              </div>
-              <div>
-                <Label>Property Type</Label>
-                <Select value={formData.property_type} onValueChange={v => setFormData({ ...formData, property_type: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="house">House</SelectItem>
-                    <SelectItem value="apartment">Apartment</SelectItem>
-                    <SelectItem value="condo">Condo</SelectItem>
-                    <SelectItem value="townhouse">Townhouse</SelectItem>
-                    <SelectItem value="commercial">Commercial</SelectItem>
-                    <SelectItem value="land">Land</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Status</Label>
-                <Select value={formData.status} onValueChange={v => setFormData({ ...formData, status: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="for_sale">For Sale</SelectItem>
-                    <SelectItem value="for_rent">For Rent</SelectItem>
-                    <SelectItem value="sold">Sold</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Price *</Label>
-                <Input type="number" required value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} />
-              </div>
-              <div>
-                <Label>Square Feet</Label>
-                <Input type="number" value={formData.square_feet} onChange={e => setFormData({ ...formData, square_feet: e.target.value })} />
-              </div>
-              <div>
-                <Label>Bedrooms</Label>
-                <Input type="number" value={formData.bedrooms} onChange={e => setFormData({ ...formData, bedrooms: e.target.value })} />
-              </div>
-              <div>
-                <Label>Bathrooms</Label>
-                <Input type="number" step="0.5" value={formData.bathrooms} onChange={e => setFormData({ ...formData, bathrooms: e.target.value })} />
-              </div>
-              <div>
-                <Label>Address</Label>
-                <Input value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} />
-              </div>
-              <div>
-                <Label>City</Label>
-                <Input value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} />
-              </div>
-              <div>
-                <Label>State</Label>
-                <Input value={formData.state} onChange={e => setFormData({ ...formData, state: e.target.value })} />
-              </div>
-              <div className="col-span-2">
-                <Label>Amenities (comma-separated)</Label>
-                <Input placeholder="Pool, Garage, Garden..." value={formData.amenities} onChange={e => setFormData({ ...formData, amenities: e.target.value })} />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
-              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
-                {editingProperty ? 'Update Property' : 'Create Property'}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {/* Add/Edit Dialog removed */}
     </div>
   )
 }

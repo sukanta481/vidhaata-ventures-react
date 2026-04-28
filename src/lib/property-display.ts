@@ -1,20 +1,27 @@
-export function formatINR(price: number, status: string) {
-  const formatted = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(price)
+export function formatINR(price: number | string, status?: string) {
+  const numPrice = Number(price);
+  if (isNaN(numPrice) || numPrice === 0) return 'Price on Request';
 
-  return status === 'for_rent' ? `${formatted}/month` : formatted
+  let formatted = '';
+  if (numPrice >= 10000000) {
+    formatted = `₹${(numPrice / 10000000).toFixed(2).replace(/\.00$/, '')} Cr`;
+  } else if (numPrice >= 100000) {
+    formatted = `₹${(numPrice / 100000).toFixed(2).replace(/\.00$/, '')} L`;
+  } else if (numPrice >= 1000) {
+    formatted = `₹${(numPrice / 1000).toFixed(2).replace(/\.00$/, '')} K`;
+  } else {
+    formatted = `₹${numPrice}`;
+  }
+
+  return status === 'for_rent' ? `${formatted}/month` : formatted;
 }
 
-export function formatINRCompact(price: number) {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    notation: 'compact',
-    maximumFractionDigits: 1,
-  }).format(price)
+export function formatINRCompact(price: number | string) {
+  return formatINR(price);
+}
+
+export function formatBathrooms(bathrooms: number | string) {
+  return Math.round(Number(bathrooms || 0));
 }
 
 export function isCommercialProperty(propertyType: string) {

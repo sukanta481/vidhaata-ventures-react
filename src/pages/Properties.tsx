@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Bed, Bath, Square, MapPin, Search, SlidersHorizontal, Building2, Home } from 'lucide-react'
 import { api } from '@/hooks/useApi'
-import { formatINR } from '@/lib/property-display'
+import { formatINR, formatBathrooms } from '@/lib/property-display'
 
 interface Property {
   id: number
@@ -227,7 +227,7 @@ export default function Properties() {
                       </div>
                       <div className="flex items-center gap-3 mt-3 text-xs text-slate-500">
                         {property.bedrooms > 0 && <span className="flex items-center gap-1"><Bed className="h-3 w-3" /> {property.bedrooms}</span>}
-                        <span className="flex items-center gap-1"><Bath className="h-3 w-3" /> {property.bathrooms}</span>
+                        <span className="flex items-center gap-1"><Bath className="h-3 w-3" /> {formatBathrooms(property.bathrooms)}</span>
                         <span className="flex items-center gap-1"><Square className="h-3 w-3" /> {property.square_feet?.toLocaleString()}</span>
                       </div>
                     </CardContent>

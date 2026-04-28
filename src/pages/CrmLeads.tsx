@@ -25,6 +25,8 @@ import {
   X,
   IndianRupee,
   MapPinned,
+  Upload,
+  Download,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { api } from '@/hooks/useApi'
@@ -139,6 +141,9 @@ export default function CrmLeads() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
   const [addLeadOpen, setAddLeadOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
+  const [importFile, setImportFile] = useState<File | null>(null)
+  const [isImporting, setIsImporting] = useState(false)
   const [addLeadForm, setAddLeadForm] = useState<LeadFormState>(defaultLeadForm)
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -374,6 +379,44 @@ export default function CrmLeads() {
     }
   }
 
+  const handleDownloadTemplate = () => {
+    const csvContent = "First Name,Last Name,Email,Phone,Source,Message,Notes\nJohn,Doe,john@example.com,9876543210,website,Looking for a 2BHK,Urgent requirement"
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", "leads_import_template.csv")
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const handleImport = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!importFile) {
+      toast.error('Please select a CSV file to import')
+      return
+    }
+    
+    setIsImporting(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', importFile)
+      
+      const response = await api.importLeads(formData)
+      toast.success(`Import completed: ${response.success_count} added, ${response.fail_count} failed`)
+      
+      setImportOpen(false)
+      setImportFile(null)
+      await loadLeads(true)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to import leads')
+    } finally {
+      setIsImporting(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -387,6 +430,9 @@ export default function CrmLeads() {
           <Button variant="outline" className="gap-2" onClick={() => void loadLeads(true)} disabled={isRefreshing}>
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             Refresh
+          </Button>
+          <Button variant="outline" className="gap-2" onClick={() => setImportOpen(true)}>
+            <Upload className="h-4 w-4" /> Import
           </Button>
           <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2" onClick={() => setAddLeadOpen(true)}>
             <Plus className="h-4 w-4" /> Add Lead
@@ -1027,6 +1073,45 @@ export default function CrmLeads() {
               </div>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+    {/* Import Dialog */}
+      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Import Leads</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleImport} className="space-y-4 pt-4">
+            <div className="space-y-4">
+              <div className="rounded-lg border border-dashed border-slate-300 p-6 text-center">
+                <Upload className="mx-auto h-8 w-8 text-slate-400 mb-2" />
+                <p className="text-sm text-slate-600 mb-4">Upload a CSV file containing your leads.</p>
+                <Input 
+                  type="file" 
+                  accept=".csv" 
+                  onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                  className="max-w-xs mx-auto cursor-pointer"
+                />
+              </div>
+              
+              <div className="bg-slate-50 p-4 rounded-lg flex items-start justify-between border border-slate-100">
+                <div className="text-sm">
+                  <p className="font-medium text-slate-900">Need a template?</p>
+                  <p className="text-slate-500 mt-1">Download our sample CSV to ensure your columns match exactly.</p>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={handleDownloadTemplate} className="gap-2 whitespace-nowrap ml-4">
+                  <Download className="h-4 w-4" /> Download CSV
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-4">
+              <Button type="button" variant="ghost" onClick={() => setImportOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={!importFile || isImporting} className="bg-emerald-600 hover:bg-emerald-700">
+                {isImporting ? 'Importing...' : 'Start Import'}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

@@ -34,6 +34,7 @@ export default function App() {
         <Route path="/crm/leads" element={<CrmLayout><CrmLeads /></CrmLayout>} />
         <Route path="/crm/listings" element={<CrmLayout><CrmListings /></CrmLayout>} />
         <Route path="/crm/listings/new" element={<CrmLayout><CrmPropertyCreate /></CrmLayout>} />
+        <Route path="/crm/listings/edit/:id" element={<CrmLayout><CrmPropertyCreate /></CrmLayout>} />
         <Route path="/crm/analytics" element={<CrmLayout><CrmAnalytics /></CrmLayout>} />
         <Route path="/crm/settings" element={<CrmLayout><CrmSettings /></CrmLayout>} />
 

@@ -255,6 +255,102 @@ class LeadController {
         $stmt->execute([$activityId, $leadId]);
         jsonResponse(['message' => 'Activity deleted successfully']);
     }
+    public function import() {
+        requireAuth();
+        
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            jsonResponse(['error' => 'No file uploaded or upload error'], 400);
+        }
+        
+        $fileTmpPath = $_FILES['file']['tmp_name'];
+        $fileName = $_FILES['file']['name'];
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        
+        if ($fileExtension !== 'csv') {
+            jsonResponse(['error' => 'Only CSV files are allowed'], 400);
+        }
+        
+        $handle = fopen($fileTmpPath, 'r');
+        if ($handle === false) {
+            jsonResponse(['error' => 'Failed to read the file'], 500);
+        }
+        
+        $headers = fgetcsv($handle);
+        if ($headers === false) {
+            fclose($handle);
+            jsonResponse(['error' => 'File is empty'], 400);
+        }
+        
+        // Normalize headers to lower case and trimmed for easier matching
+        $headers = array_map('strtolower', array_map('trim', $headers));
+        
+        // Find indexes
+        $idxFullName = array_search('full name', $headers);
+        $idxFirstName = array_search('first name', $headers);
+        $idxLastName = array_search('last name', $headers);
+        $idxPhone = array_search('phone', $headers);
+        $idxEmail = array_search('email', $headers);
+        $idxSource = array_search('source', $headers);
+        $idxMessage = array_search('message', $headers);
+        $idxNotes = array_search('notes', $headers);
+        
+        // At least Phone is required. We also need some name.
+        if ($idxPhone === false || ($idxFullName === false && $idxFirstName === false)) {
+            fclose($handle);
+            jsonResponse(['error' => 'CSV must contain at least a Name (Full Name or First Name) and Phone column'], 400);
+        }
+        
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO leads (first_name, last_name, email, phone, message, source, status, notes) 
+                              VALUES (?, ?, ?, ?, ?, ?, 'new', ?)");
+                              
+        $successCount = 0;
+        $failCount = 0;
+        
+        $db->beginTransaction();
+        try {
+            while (($row = fgetcsv($handle)) !== false) {
+                // Pad row if it has fewer columns than headers
+                $row = array_pad($row, count($headers), '');
+                
+                $firstName = '';
+                $lastName = '';
+                
+                if ($idxFullName !== false && !empty($row[$idxFullName])) {
+                    [$firstName, $lastName] = $this->splitFullName($row[$idxFullName]);
+                } else {
+                    $firstName = $idxFirstName !== false ? trim($row[$idxFirstName]) : '';
+                    $lastName = $idxLastName !== false ? trim($row[$idxLastName]) : '';
+                }
+                
+                $phone = $idxPhone !== false ? trim($row[$idxPhone]) : '';
+                $email = $idxEmail !== false ? trim($row[$idxEmail]) : '';
+                $source = $idxSource !== false && !empty(trim($row[$idxSource])) ? trim($row[$idxSource]) : 'website';
+                $message = $idxMessage !== false ? trim($row[$idxMessage]) : '';
+                $notes = $idxNotes !== false ? trim($row[$idxNotes]) : '';
+                
+                if (empty($firstName) || empty($phone)) {
+                    $failCount++;
+                    continue;
+                }
+                
+                $stmt->execute([$firstName, $lastName, $email, $phone, $message, $source, $notes]);
+                $successCount++;
+            }
+            $db->commit();
+        } catch (Exception $e) {
+            $db->rollBack();
+            fclose($handle);
+            jsonResponse(['error' => 'Failed to process CSV data: ' . $e->getMessage()], 500);
+        }
+        
+        fclose($handle);
+        jsonResponse([
+            'message' => 'Import completed',
+            'success_count' => $successCount,
+            'fail_count' => $failCount
+        ]);
+    }
     
     public function getStats() {
         requireAuth();

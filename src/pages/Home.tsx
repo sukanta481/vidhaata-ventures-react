@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Bed, Bath, Square, MapPin, ArrowRight, Search, Shield, TrendingUp, Headphones, Building2, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { api } from '@/hooks/useApi'
-import { formatINR, formatINRCompact } from '@/lib/property-display'
+import { formatINR, formatINRCompact, formatBathrooms } from '@/lib/property-display'
 
 interface Property {
   id: number
@@ -152,7 +152,7 @@ export default function Home() {
                       </div>
                       <div className="flex items-center gap-4 text-sm text-slate-600">
                         <span className="flex items-center gap-1"><Bed className="h-4 w-4" /> {property.bedrooms}</span>
-                        <span className="flex items-center gap-1"><Bath className="h-4 w-4" /> {property.bathrooms}</span>
+                        <span className="flex items-center gap-1"><Bath className="h-4 w-4" /> {formatBathrooms(property.bathrooms)}</span>
                         <span className="flex items-center gap-1"><Square className="h-4 w-4" /> {property.square_feet?.toLocaleString()} sqft</span>
                       </div>
                     </CardContent>
@@ -188,7 +188,7 @@ export default function Home() {
                     <p className="text-xs text-slate-500 mt-1">{property.city}, {property.state}</p>
                     <div className="flex items-center gap-3 mt-3 text-xs text-slate-500">
                       <span className="flex items-center gap-1"><Bed className="h-3 w-3" /> {property.bedrooms}</span>
-                      <span className="flex items-center gap-1"><Bath className="h-3 w-3" /> {property.bathrooms}</span>
+                      <span className="flex items-center gap-1"><Bath className="h-3 w-3" /> {formatBathrooms(property.bathrooms)}</span>
                       <span className="flex items-center gap-1"><Square className="h-3 w-3" /> {property.square_feet}</span>
                     </div>
                   </CardContent>

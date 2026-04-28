@@ -62,6 +62,7 @@ switch ($resource) {
         } else {
             if ($method === 'GET' && is_numeric($action)) $controller->get($action);
             if ($method === 'PUT' && is_numeric($action)) $controller->update($action);
+            if ($method === 'POST' && is_numeric($action)) $controller->update($action);
             if ($method === 'DELETE' && is_numeric($action)) $controller->delete($action);
         }
         break;
@@ -73,6 +74,8 @@ switch ($resource) {
             if ($method === 'POST') $controller->create();
         } elseif ($action === 'stats') {
             if ($method === 'GET') $controller->getStats();
+        } elseif ($action === 'import' && $method === 'POST') {
+            $controller->import();
         } elseif (is_numeric($action)) {
             if ($method === 'GET') $controller->get($action);
             if ($method === 'PUT') $controller->update($action);

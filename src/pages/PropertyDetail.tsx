@@ -22,7 +22,7 @@ import {
   CalendarDays,
 } from 'lucide-react'
 import { api } from '@/hooks/useApi'
-import { formatINR, isCommercialProperty, parsePropertyDescription } from '@/lib/property-display'
+import { formatINR, isCommercialProperty, parsePropertyDescription, formatBathrooms } from '@/lib/property-display'
 
 interface Property {
   id: number
@@ -250,14 +250,14 @@ export default function PropertyDetail() {
               {isCommercial ? (
                 <>
                   <StatCard icon={Building2} label="Built-up Area" value={property.square_feet ? `${property.square_feet.toLocaleString()} sq ft` : '-'} />
-                  <StatCard icon={Bath} label="Washrooms" value={String(property.bathrooms || 0)} />
+                  <StatCard icon={Bath} label="Washrooms" value={String(formatBathrooms(property.bathrooms))} />
                   <StatCard icon={IndianRupee} label="Price / sq ft" value={pricePerSqft} />
                   <StatCard icon={Briefcase} label="Use Type" value={commercialFacts[0]?.value || 'Commercial'} />
                 </>
               ) : (
                 <>
                   <StatCard icon={Bed} label="Bedrooms" value={String(property.bedrooms || 0)} />
-                  <StatCard icon={Bath} label="Bathrooms" value={String(property.bathrooms || 0)} />
+                  <StatCard icon={Bath} label="Bathrooms" value={String(formatBathrooms(property.bathrooms))} />
                   <StatCard icon={Square} label="Area" value={property.square_feet ? `${property.square_feet.toLocaleString()} sq ft` : '-'} />
                   <StatCard icon={Building2} label="Configuration" value={residentialFacts[0]?.value || '-'} />
                 </>
