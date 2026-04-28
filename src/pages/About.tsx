@@ -1,7 +1,7 @@
-import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Award, Users, Target, Shield, ArrowRight, Building2 } from 'lucide-react'
+import { Link } from 'react-router'
 
 export default function About() {
   return (
@@ -15,7 +15,7 @@ export default function About() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">About Vidhaata Ventures</h1>
           <p className="text-lg text-slate-300 max-w-2xl">
-            Connecting people with their perfect properties through innovative technology and personalized service since 2015.
+            Connecting people with their perfect properties through trusted guidance, local expertise, and genuine relationships — since 2005.
           </p>
         </div>
       </section>
@@ -27,37 +27,38 @@ export default function About() {
             <div>
               <h2 className="text-3xl font-bold text-slate-900 mb-4">Our Story</h2>
               <p className="text-slate-600 mb-4 leading-relaxed">
-                Vidhaata Ventures was founded with a simple mission: to transform the real estate experience by combining thoughtful market knowledge with genuine human connection. What started as a focused team has grown into a trusted property advisory brand serving homebuyers, tenants, and investors.
+                Vidhaata Ventures was founded by Anish Chowdhury with a clear purpose: to make property buying, selling, and renting in Kolkata a transparent, stress-free experience for every client.
               </p>
               <p className="text-slate-600 mb-4 leading-relaxed">
-                We believe that finding the right property should feel exciting, not stressful. Our systems and workflows help the team deliver seamless, personalized service to every client.
+                What began as a focused practice rooted in deep local market knowledge has grown into a trusted real estate advisory serving homebuyers, tenants, investors, and developers across the city.
+                <br />Anish believes that finding the right property should never feel overwhelming. By combining honest market guidance with a personal, relationship-driven approach, Vidhaata Ventures has helped hundreds of clients make confident decisions about their most important investments.
               </p>
               <p className="text-slate-600 leading-relaxed">
-                Today, Vidhaata Ventures continues to expand its reach with a client-first approach, local market expertise, and a strong focus on long-term relationships.
+                Today, the firm continues to grow — with a commitment to integrity, client-first service, and a thorough understanding of Kolkata's ever-evolving property landscape.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <Card className="bg-emerald-50 border-emerald-100">
                 <CardContent className="p-6 text-center">
-                  <p className="text-4xl font-bold text-emerald-600 mb-1">5,000+</p>
+                  <p className="text-4xl font-bold text-emerald-600 mb-1">5,00+</p>
                   <p className="text-sm text-slate-600">Happy Clients</p>
                 </CardContent>
               </Card>
               <Card className="bg-slate-50 border-slate-100">
                 <CardContent className="p-6 text-center">
-                  <p className="text-4xl font-bold text-slate-700 mb-1">200+</p>
-                  <p className="text-sm text-slate-600">Expert Agents</p>
+                  <p className="text-4xl font-bold text-slate-700 mb-1">10+</p>
+                  <p className="text-sm text-slate-600">Years of Local Experience</p>
                 </CardContent>
               </Card>
               <Card className="bg-slate-50 border-slate-100">
                 <CardContent className="p-6 text-center">
-                  <p className="text-4xl font-bold text-slate-700 mb-1">45+</p>
-                  <p className="text-sm text-slate-600">Cities Covered</p>
+                  <p className="text-4xl font-bold text-slate-700 mb-1">25+</p>
+                  <p className="text-sm text-slate-600">Areas Covered in Kolkata</p>
                 </CardContent>
               </Card>
               <Card className="bg-emerald-50 border-emerald-100">
                 <CardContent className="p-6 text-center">
-                  <p className="text-4xl font-bold text-emerald-600 mb-1">$2.5B</p>
+                  <p className="text-4xl font-bold text-emerald-600 mb-1">₹150Cr+</p>
                   <p className="text-sm text-slate-600">Properties Sold</p>
                 </CardContent>
               </Card>
@@ -100,30 +101,30 @@ export default function About() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Meet Our Leadership</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Leadership Bio</h2>
             <p className="text-slate-500 max-w-2xl mx-auto">
-              Experienced professionals dedicated to transforming the real estate industry
+              Guiding Vidhaata Ventures with integrity and vision
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { name: 'Sarah Mitchell', role: 'CEO & Founder', image: '/images/agent-1.jpg', desc: '20+ years in real estate, former VP at national brokerage.' },
-              { name: 'Michael Chen', role: 'COO', image: '/images/agent-2.jpg', desc: 'Operations expert with background in tech startups.' },
-              { name: 'David Williams', role: 'Head of Sales', image: '/images/agent-2.jpg', desc: 'Led teams to $500M+ in annual sales volume.' },
-              { name: 'Lisa Park', role: 'Marketing Director', image: '/images/agent-1.jpg', desc: 'Digital marketing strategist with Fortune 500 experience.' },
-            ].map(member => (
-              <Card key={member.name} className="overflow-hidden">
-                <div className="h-48 overflow-hidden">
-                  <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+          <Card className="max-w-[800px] mx-auto overflow-hidden shadow-sm hover:shadow-md transition-shadow border-slate-200">
+            <div className="flex flex-col md:flex-row">
+              <div className="md:w-[40%] h-72 md:h-auto min-h-[350px]">
+                <img src="/images/anish.webp" alt="Anish Chowdhury" className="w-full h-full object-cover object-top" />
+              </div>
+              <div className="md:w-[60%] p-8 flex flex-col justify-center">
+                <h3 className="text-2xl font-bold text-slate-900">Anish Chowdhury</h3>
+                <p className="text-emerald-600 font-medium mb-4">CEO & Founder</p>
+                <div className="space-y-4 text-slate-600 leading-relaxed text-sm sm:text-base">
+                  <p>
+                    With over a decade of experience in Kolkata's real estate market, Anish Chowdhury founded Vidhaata Ventures to bring honesty and professionalism to property dealings in the city. A trusted name among homebuyers, investors, and developers alike, Anish has guided clients through hundreds of successful transactions — from residential apartments in South Kolkata to commercial spaces across the city.
+                  </p>
+                  <p>
+                    His hands-on approach, deep neighborhood knowledge, and commitment to long-term relationships set Vidhaata Ventures apart in a competitive market.
+                  </p>
                 </div>
-                <CardContent className="p-5">
-                  <h3 className="font-semibold text-slate-900">{member.name}</h3>
-                  <p className="text-sm text-emerald-600 mb-2">{member.role}</p>
-                  <p className="text-sm text-slate-500">{member.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+              </div>
+            </div>
+          </Card>
         </div>
       </section>
 
@@ -142,7 +143,7 @@ export default function About() {
               </Button>
             </Link>
             <Link to="/properties">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 gap-2">
+              <Button size="lg" variant="outline" className="border-white text-emerald-700 hover:bg-white/10 gap-2">
                 Browse Properties <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>

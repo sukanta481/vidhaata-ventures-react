@@ -72,7 +72,7 @@ export default function Home() {
                 </Button>
               </Link>
               <Link to="/contact">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-slate-900 gap-2">
+                <Button size="lg" variant="outline" className="border-white text-emerald-700 hover:bg-white hover:text-slate-900 gap-2">
                   <Headphones className="h-5 w-5" />
                   Talk to an Agent
                 </Button>
@@ -203,7 +203,7 @@ export default function Home() {
       <section className="py-16 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Why Choose Vidhaata Ventures?</h2>
+            <h2 className="text-3xl font-bold mb-4">Why Choose Vidhaata Ventures?</h2>
             <p className="text-slate-400 max-w-2xl mx-auto">
               We combine cutting-edge technology with personalized service to deliver an unmatched real estate experience.
             </p>
@@ -252,7 +252,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link to="/contact">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button size="lg" variant="outline" className="border-white text-emerald-700 hover:bg-white/10">
                 Contact Us
               </Button>
             </Link>
