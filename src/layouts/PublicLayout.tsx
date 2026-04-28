@@ -126,8 +126,11 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               </ul>
             </div>
           </div>
-          <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-500">
-            &copy; {new Date().getFullYear()} Vidhaata Ventures. All rights reserved.
+          <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500 gap-4">
+            <div>&copy; {new Date().getFullYear()} Vidhaata Ventures. All rights reserved.</div>
+            <div>
+              Designed & Developed by <a href="https://biznexa.tech" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 font-medium transition-colors">Biznexa</a>
+            </div>
           </div>
         </div>
       </footer>

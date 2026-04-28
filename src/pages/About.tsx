@@ -133,7 +133,7 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Work With Vidhaata Ventures</h2>
           <p className="text-emerald-100 max-w-2xl mx-auto mb-8">
-            Whether you're looking to buy, sell, or join our team as an agent, we'd love to hear from you.
+            Whether you're looking to buy, sell, rent, or invest<br />we'd love to help you find the right property.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/contact">

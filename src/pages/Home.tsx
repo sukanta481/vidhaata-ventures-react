@@ -62,7 +62,7 @@ export default function Home() {
               Find Your Perfect <span className="text-emerald-400">Property</span> Today
             </h1>
             <p className="text-lg text-slate-300 mb-8">
-              Discover luxury homes, commercial spaces, and investment properties. Our expert agents are here to guide you every step of the way.
+              Discover luxury homes, commercial spaces, and investment properties. Our expert agents are here to guide you every step of the way— honestly and transparently.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/properties">
@@ -87,10 +87,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { label: 'Properties Listed', value: '2,500+', icon: Building2 },
-              { label: 'Happy Clients', value: '1,200+', icon: Users },
-              { label: 'Cities Covered', value: '45+', icon: MapPin },
-              { label: 'Avg. Sale Price', value: formatINRCompact(8500000), icon: TrendingUp },
+              { label: 'Properties Listed', value: '100+', icon: Building2 },
+              { label: 'Happy Clients', value: '300+', icon: Users },
+              { label: 'Areas Covered in Kolkata', value: "25+", icon: MapPin },
+              { label: 'Avg. Sale Price', value: formatINRCompact(7000000), icon: TrendingUp },
             ].map(stat => (
               <div key={stat.label} className="text-center">
                 <stat.icon className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
