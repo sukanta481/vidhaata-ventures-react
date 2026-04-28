@@ -35,7 +35,7 @@ function envValue($key, $default = null) {
 define('DB_HOST', envValue('DB_HOST', 'localhost'));
 define('DB_NAME', envValue('DB_NAME', 'u286257250_vidhaata_react'));
 define('DB_USER', envValue('DB_USER', 'u286257250_vidhaata_react'));
-define('DB_PASS', envValue('DB_PASS', '00suka00'));
+define('DB_PASS', envValue('DB_PASS', 'Sukanta@0050'));
 define('DB_CHARSET', 'utf8mb4');
 define('JWT_SECRET', envValue('JWT_SECRET', 'Xk7#mP9@qL2$nR5wYvBz!cDfGhJtUeA_vidhaata'));
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
