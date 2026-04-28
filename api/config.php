@@ -32,10 +32,19 @@ function envValue($key, $default = null) {
     return $default;
 }
 
-define('DB_HOST', envValue('DB_HOST', 'localhost'));
-define('DB_NAME', envValue('DB_NAME', 'u286257250_vidhaata_react'));
-define('DB_USER', envValue('DB_USER', 'u286257250_vidhaata_react'));
-define('DB_PASS', envValue('DB_PASS', 'Sukanta@0050'));
+$is_localhost = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1']) || strpos($_SERVER['HTTP_HOST'] ?? '', 'localhost') !== false;
+
+if ($is_localhost) {
+    define('DB_HOST', envValue('DB_HOST', 'localhost'));
+    define('DB_NAME', envValue('DB_NAME', 'estateflow'));
+    define('DB_USER', envValue('DB_USER', 'root'));
+    define('DB_PASS', envValue('DB_PASS', ''));
+} else {
+    define('DB_HOST', envValue('DB_HOST', 'localhost'));
+    define('DB_NAME', envValue('DB_NAME', 'u286257250_vidhaata_react'));
+    define('DB_USER', envValue('DB_USER', 'u286257250_vidhaata_react'));
+    define('DB_PASS', envValue('DB_PASS', 'Sukanta@0050'));
+}
 define('DB_CHARSET', 'utf8mb4');
 define('JWT_SECRET', envValue('JWT_SECRET', 'Xk7#mP9@qL2$nR5wYvBz!cDfGhJtUeA_vidhaata'));
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
