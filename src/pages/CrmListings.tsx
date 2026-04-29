@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
@@ -42,9 +42,27 @@ const mockProperties: Property[] = [
 export default function CrmListings() {
   const [properties, setProperties] = useState<Property[]>(mockProperties)
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialStatus = searchParams.get('status') || 'all'
+  const [statusFilter, setStatusFilter] = useState(initialStatus)
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const statusParam = searchParams.get('status')
+    if (statusParam && statusParam !== statusFilter) {
+      setStatusFilter(statusParam)
+    }
+  }, [searchParams])
+
+  const handleStatusChange = (val: string) => {
+    setStatusFilter(val)
+    if (val === 'all') {
+      setSearchParams({})
+    } else {
+      setSearchParams({ status: val })
+    }
+  }
 
   const filtered = properties.filter(p => {
     const q = search.toLowerCase()
@@ -115,9 +133,9 @@ export default function CrmListings() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input placeholder="Search properties..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={handleStatusChange}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="All Statuses" />
+            <SelectValue placeholder="All status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>

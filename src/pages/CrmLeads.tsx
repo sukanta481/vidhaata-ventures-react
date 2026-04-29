@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -157,12 +158,19 @@ export default function CrmLeads() {
     propertyInterestId: 'none',
   })
 
+  const [searchParams, setSearchParams] = useSearchParams()
+  const filterParam = searchParams.get('filter')
+
   const loadLeads = async (showRefreshState = false) => {
     if (showRefreshState) setIsRefreshing(true)
     else setIsLoading(true)
 
     try {
-      const response = await api.listLeads()
+      const params: Record<string, string> = {}
+      if (filterParam) {
+        params.filter = filterParam
+      }
+      const response = await api.listLeads(params)
       setLeads(Array.isArray(response?.leads) ? response.leads.map((lead: Lead) => ({
         ...lead,
         activities: Array.isArray(lead.activities) ? lead.activities : [],
@@ -189,7 +197,7 @@ export default function CrmLeads() {
 
   useEffect(() => {
     void Promise.all([loadLeads(), loadProperties()])
-  }, [])
+  }, [filterParam])
 
   const filtered = useMemo(() => {
     return leads.filter((lead) => {
@@ -459,6 +467,18 @@ export default function CrmLeads() {
           </button>
         ))}
       </div>
+
+      {filterParam && (
+        <div className="flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-800 border border-emerald-100">
+          <Filter className="h-4 w-4" />
+          <span>
+            Showing filtered leads: <strong>{filterParam === 'today_visits' ? "Today's Visits" : filterParam === 'month_leads' ? "New Leads (This Month)" : filterParam}</strong>
+          </span>
+          <Button variant="outline" size="sm" className="ml-auto h-8 border-emerald-200 bg-white hover:bg-emerald-100 hover:text-emerald-900" onClick={() => setSearchParams({})}>
+            Clear Filter
+          </Button>
+        </div>
+      )}
 
       <Card className="border-slate-200">
         <CardContent className="p-4">

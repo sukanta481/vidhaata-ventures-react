@@ -44,6 +44,7 @@ class LeadController {
         $status = $_GET['status'] ?? null;
         $source = $_GET['source'] ?? null;
         $search = $_GET['search'] ?? null;
+        $filter = $_GET['filter'] ?? null;
         $limit = (int)($_GET['limit'] ?? 50);
         $offset = (int)($_GET['offset'] ?? 0);
         
@@ -65,6 +66,12 @@ class LeadController {
             $params[] = $like;
             $params[] = $like;
             $params[] = $like;
+        }
+        
+        if ($filter === 'today_visits') {
+            $where[] = "EXISTS (SELECT 1 FROM lead_activities la WHERE la.lead_id = l.id AND la.activity_type = 'meeting' AND la.follow_up_date IS NOT NULL AND DATE(la.follow_up_date) = CURDATE())";
+        } elseif ($filter === 'month_leads') {
+            $where[] = "MONTH(l.created_at) = MONTH(CURRENT_DATE()) AND YEAR(l.created_at) = YEAR(CURRENT_DATE())";
         }
         
         $whereClause = implode(' AND ', $where);

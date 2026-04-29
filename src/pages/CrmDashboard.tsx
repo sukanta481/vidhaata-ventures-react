@@ -159,7 +159,7 @@ export default function CrmDashboard() {
       iconBg: 'bg-white/20',
       iconColor: 'text-white',
       hover: 'hover:shadow-orange-200',
-      href: '/crm/listings'
+      href: '/crm/listings?status=sold'
     },
     {
       title: "Today's Visits",
@@ -169,7 +169,7 @@ export default function CrmDashboard() {
       iconBg: 'bg-white/20',
       iconColor: 'text-white',
       hover: 'hover:shadow-teal-200',
-      href: '/crm/leads'
+      href: '/crm/leads?filter=today_visits'
     },
     {
       title: 'New Leads (Month)',
@@ -179,7 +179,7 @@ export default function CrmDashboard() {
       iconBg: 'bg-white/20',
       iconColor: 'text-white',
       hover: 'hover:shadow-sky-200',
-      href: '/crm/leads'
+      href: '/crm/leads?filter=month_leads'
     },
   ]
 
