@@ -117,7 +117,7 @@ class LeadController {
         
         // Get activities
         if ($this->leadActivitiesSupportsFollowUpFields($db)) {
-            $stmt = $db->prepare("SELECT la.*, u.full_name as created_by_name, p.title as activity_property_title
+            $stmt = $db->prepare("SELECT la.*, la.property_interest_id as activity_property_id, u.full_name as created_by_name, p.title as activity_property_title
                                   FROM lead_activities la 
                                   LEFT JOIN users u ON la.created_by = u.id 
                                   LEFT JOIN properties p ON la.property_interest_id = p.id

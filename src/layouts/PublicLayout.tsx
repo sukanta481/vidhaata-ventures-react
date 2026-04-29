@@ -121,7 +121,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 </li>
                 <li className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-emerald-500" />
-                  Ventures.vidhaata@ gmail.com
+                  Ventures.vidhaata@gmail.com
                 </li>
               </ul>
             </div>
