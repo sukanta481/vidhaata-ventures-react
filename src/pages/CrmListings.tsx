@@ -6,8 +6,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 // Dialog removed
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Search, Plus, Edit, Trash2, Bed, Bath, Square, MapPin } from 'lucide-react'
 import { toast } from 'sonner'
 import { api } from '@/hooks/useApi'

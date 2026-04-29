@@ -450,7 +450,7 @@ export default function CrmPropertyCreate() {
     if (isEditMode && id) {
       setSaveMessage('Loading property details...')
       api.getProperty(Number(id)).then(property => {
-        const { rawDescription, metadata } = parsePropertyDescription(property.description || '')
+        const { summary, metadata } = parsePropertyDescription(property.description || '')
         
         const pg = (metadata['property group']?.toLowerCase().replace(' ', '_') as PropertyGroup) || 
                    (property.property_type === 'commercial' ? 'commercial' : property.property_type === 'land' ? 'land_plot' : 'residential')
@@ -467,7 +467,7 @@ export default function CrmPropertyCreate() {
           city: property.city || '',
           state: property.state || '',
           pincode: property.zip_code || '',
-          description: rawDescription,
+          description: summary,
           bathrooms: property.bathrooms ? String(property.bathrooms) : '',
           builtUpArea: property.square_feet ? String(property.square_feet) : '',
           totalArea: property.square_feet ? String(property.square_feet) : '',
@@ -493,7 +493,7 @@ export default function CrmPropertyCreate() {
         
         setForm(newForm)
         setSaveMessage('Ready to update this listing.')
-      }).catch(err => {
+      }).catch(() => {
         toast.error('Failed to load property details')
         navigate('/crm/listings')
       })
