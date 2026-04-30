@@ -77,7 +77,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src="/images/vidhaataventureslogo.webp" alt="Vidhaata Ventures" className="h-10 w-auto" />
+                <img src="/images/logo.webp" alt="Vidhaata Ventures" className="h-10 w-auto" />
                 {/* <span className="text-lg font-bold text-white">Vidhaata Ventures</span> */}
               </div>
               <p className="text-sm text-slate-400 mb-4">
