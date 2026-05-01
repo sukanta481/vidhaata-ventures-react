@@ -31,6 +31,8 @@ type LeadFormState = {
   propertyInterestId: string
   message: string
   notes: string
+  referralName: string
+  referralPhone: string
 }
 
 const LEAD_SOURCE_OPTIONS = [
@@ -62,6 +64,8 @@ const defaultLeadForm: LeadFormState = {
   propertyInterestId: 'none',
   message: '',
   notes: '',
+  referralName: '',
+  referralPhone: '',
 }
 
 export default function CrmLeadCreate() {
@@ -109,6 +113,8 @@ export default function CrmLeadCreate() {
       const requirementLines = [
         `Lead Type: ${addLeadForm.leadType}`,
         `WhatsApp Available: ${addLeadForm.whatsappAvailable ? 'Yes' : 'No'}`,
+        addLeadForm.source === 'personal_referral' && addLeadForm.referralName ? `Referral Name: ${addLeadForm.referralName}` : '',
+        addLeadForm.source === 'personal_referral' && addLeadForm.referralPhone ? `Referral Phone: ${addLeadForm.referralPhone}` : '',
         addLeadForm.preferredLocations ? `Preferred Locations: ${addLeadForm.preferredLocations}` : '',
         addLeadForm.configurations.length ? `Configuration Preference: ${addLeadForm.configurations.join(', ')}` : '',
         addLeadForm.budgetMin || addLeadForm.budgetMax ? `Budget Range: ${addLeadForm.budgetMin || '0'} - ${addLeadForm.budgetMax || 'Open'}` : '',
@@ -252,6 +258,28 @@ export default function CrmLeadCreate() {
                       </SelectContent>
                     </Select>
                   </div>
+                  {addLeadForm.source === 'personal_referral' && (
+                    <>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-800">Referral Name</Label>
+                        <Input
+                          value={addLeadForm.referralName}
+                          onChange={(event) => setAddLeadForm({ ...addLeadForm, referralName: event.target.value })}
+                          placeholder="John Doe"
+                          className="h-11 rounded-xl border-0 bg-slate-100 shadow-none focus-visible:ring-2 focus-visible:ring-slate-900"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-800">Referral Phone</Label>
+                        <Input
+                          value={addLeadForm.referralPhone}
+                          onChange={(event) => setAddLeadForm({ ...addLeadForm, referralPhone: event.target.value })}
+                          placeholder="98765 43210"
+                          className="h-11 rounded-xl border-0 bg-slate-100 shadow-none focus-visible:ring-2 focus-visible:ring-slate-900"
+                        />
+                      </div>
+                    </>
+                  )}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-slate-800">Lead Type</Label>
                     <div className="grid grid-cols-3 gap-2">
