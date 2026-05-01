@@ -15,6 +15,7 @@ import {
   Phone,
   Mail,
   Trash2,
+  Edit,
   Eye,
   UserPlus,
   Filter,
@@ -156,6 +157,17 @@ export default function CrmLeads() {
     notes: '',
     followUpDate: '',
     propertyInterestId: 'none',
+  })
+  const [editLeadOpen, setEditLeadOpen] = useState(false)
+  const [editLeadForm, setEditLeadForm] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    source: 'website',
+    propertyInterestId: 'none',
+    message: '',
+    notes: '',
   })
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -382,6 +394,56 @@ export default function CrmLeads() {
       toast.success('Lead created successfully')
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to create lead')
+    } finally {
+      setIsSavingLead(false)
+    }
+  }
+
+  const openEditDialog = () => {
+    if (!selectedLead) return
+    setEditLeadForm({
+      firstName: selectedLead.first_name || '',
+      lastName: selectedLead.last_name || '',
+      phone: selectedLead.phone || '',
+      email: selectedLead.email || '',
+      source: selectedLead.source || 'website',
+      propertyInterestId: selectedLead.property_interest_id ? String(selectedLead.property_interest_id) : 'none',
+      message: selectedLead.message || '',
+      notes: selectedLead.notes || '',
+    })
+    setEditLeadOpen(true)
+  }
+
+  const handleEditLeadSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedLead) return
+
+    setIsSavingLead(true)
+    try {
+      await api.updateLead(selectedLead.id, {
+        firstName: editLeadForm.firstName,
+        lastName: editLeadForm.lastName,
+        phone: editLeadForm.phone,
+        email: editLeadForm.email,
+        source: editLeadForm.source,
+        status: selectedLead.status,
+        propertyInterestId: editLeadForm.propertyInterestId === 'none' ? null : Number(editLeadForm.propertyInterestId),
+        assignedAgentId: selectedLead.assigned_agent_id,
+        message: editLeadForm.message,
+        notes: editLeadForm.notes,
+      })
+      
+      toast.success('Lead updated successfully')
+      setEditLeadOpen(false)
+      await loadLeads(true)
+      
+      const updatedLead = await api.getLead(selectedLead.id)
+      setSelectedLead({
+        ...updatedLead,
+        activities: Array.isArray(updatedLead.activities) ? updatedLead.activities : []
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update lead')
     } finally {
       setIsSavingLead(false)
     }
@@ -906,6 +968,81 @@ export default function CrmLeads() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit Lead Dialog */}
+      <Dialog open={editLeadOpen} onOpenChange={setEditLeadOpen}>
+        <DialogContent className="max-w-xl max-h-[85vh] p-0 overflow-hidden bg-slate-50">
+          <div className="flex flex-col h-full overflow-y-auto">
+            <div className="border-b border-slate-200 bg-white px-6 py-4 sm:px-8">
+              <DialogTitle className="text-xl font-bold text-slate-900">Edit Lead</DialogTitle>
+              <p className="mt-1 text-sm text-slate-500">Update contact information and basic requirements.</p>
+            </div>
+            <form onSubmit={(e) => void handleEditLeadSave(e)} className="flex flex-col gap-6 p-6 sm:px-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>First Name <span className="text-red-500">*</span></Label>
+                  <Input required value={editLeadForm.firstName} onChange={(e) => setEditLeadForm({...editLeadForm, firstName: e.target.value})} className="bg-white" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Last Name</Label>
+                  <Input value={editLeadForm.lastName} onChange={(e) => setEditLeadForm({...editLeadForm, lastName: e.target.value})} className="bg-white" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Phone <span className="text-red-500">*</span></Label>
+                  <Input required type="tel" value={editLeadForm.phone} onChange={(e) => setEditLeadForm({...editLeadForm, phone: e.target.value})} className="bg-white" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" value={editLeadForm.email} onChange={(e) => setEditLeadForm({...editLeadForm, email: e.target.value})} className="bg-white" />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Source</Label>
+                  <Select value={editLeadForm.source} onValueChange={(value) => setEditLeadForm({...editLeadForm, source: value})}>
+                    <SelectTrigger className="bg-white"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {LEAD_SOURCE_FILTER_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Linked Property</Label>
+                  <Select value={editLeadForm.propertyInterestId} onValueChange={(value) => setEditLeadForm({...editLeadForm, propertyInterestId: value})}>
+                    <SelectTrigger className="bg-white"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">General enquiry</SelectItem>
+                      {properties.map((prop) => (
+                        <SelectItem key={prop.id} value={String(prop.id)}>{prop.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Client Brief / Message</Label>
+                <Textarea rows={4} value={editLeadForm.message} onChange={(e) => setEditLeadForm({...editLeadForm, message: e.target.value})} className="bg-white" />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Internal Notes</Label>
+                <Textarea rows={3} value={editLeadForm.notes} onChange={(e) => setEditLeadForm({...editLeadForm, notes: e.target.value})} className="bg-white" />
+              </div>
+              
+              <div className="flex gap-3 justify-end pt-2">
+                <Button type="button" variant="outline" onClick={() => setEditLeadOpen(false)}>Cancel</Button>
+                <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700" disabled={isSavingLead}>
+                  {isSavingLead ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           {selectedLead && (
@@ -1086,7 +1223,10 @@ export default function CrmLeads() {
                       <Mail className="h-4 w-4" /> Send Email
                     </a>
                   </Button>
-                  <Button variant="outline" className="ml-auto gap-2 text-red-500 hover:text-red-600" onClick={() => void handleDelete(selectedLead.id)}>
+                  <Button variant="outline" className="ml-auto gap-2 text-slate-700 hover:text-emerald-600" onClick={openEditDialog}>
+                    <Edit className="h-4 w-4" /> Edit
+                  </Button>
+                  <Button variant="outline" className="gap-2 text-red-500 hover:text-red-600" onClick={() => void handleDelete(selectedLead.id)}>
                     <Trash2 className="h-4 w-4" /> Delete
                   </Button>
                 </div>
