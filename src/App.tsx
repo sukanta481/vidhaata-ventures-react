@@ -10,6 +10,7 @@ import Login from './pages/Login'
 import CrmDashboard from './pages/CrmDashboard'
 import CrmLeads from './pages/CrmLeads'
 import CrmListings from './pages/CrmListings'
+import CrmLeadCreate from './pages/CrmLeadCreate'
 import CrmPropertyCreate from './pages/CrmPropertyCreate'
 import CrmAnalytics from './pages/CrmAnalytics'
 import CrmSettings from './pages/CrmSettings'
@@ -32,6 +33,7 @@ export default function App() {
         {/* CRM Routes */}
         <Route path="/crm" element={<CrmLayout><CrmDashboard /></CrmLayout>} />
         <Route path="/crm/leads" element={<CrmLayout><CrmLeads /></CrmLayout>} />
+        <Route path="/crm/leads/new" element={<CrmLayout><CrmLeadCreate /></CrmLayout>} />
         <Route path="/crm/listings" element={<CrmLayout><CrmListings /></CrmLayout>} />
         <Route path="/crm/listings/new" element={<CrmLayout><CrmPropertyCreate /></CrmLayout>} />
         <Route path="/crm/listings/edit/:id" element={<CrmLayout><CrmPropertyCreate /></CrmLayout>} />
