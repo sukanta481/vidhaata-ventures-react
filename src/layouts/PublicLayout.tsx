@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router'
-import { Phone, Mail, MapPin, Facebook, Twitter, Instagram, Linkedin, Menu, X } from 'lucide-react'
+import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -83,11 +83,16 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <p className="text-sm text-slate-400 mb-4">
                 Your trusted partner in finding the right property. Vidhaata Ventures connects buyers, tenants, and investors with spaces that fit real goals.
               </p>
-              <div className="flex gap-3">
-                <Facebook className="h-5 w-5 hover:text-emerald-500 cursor-pointer" />
-                <Twitter className="h-5 w-5 hover:text-emerald-500 cursor-pointer" />
-                <Instagram className="h-5 w-5 hover:text-emerald-500 cursor-pointer" />
-                <Linkedin className="h-5 w-5 hover:text-emerald-500 cursor-pointer" />
+              <div className="flex gap-4">
+                <a href="https://www.facebook.com/share/1EDa9DEoS9/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                  <Facebook className="h-5 w-5 hover:text-emerald-500 cursor-pointer transition-colors" />
+                </a>
+                <a href="https://www.instagram.com/vidhaventures?igsh=bWlyMTgzNHVnM3Fv&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <Instagram className="h-5 w-5 hover:text-emerald-500 cursor-pointer transition-colors" />
+                </a>
+                <a href="https://youtube.com/@vidhaataventures?si=DMSf1vgdFMofptEK" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                  <Youtube className="h-6 w-6 hover:text-emerald-500 cursor-pointer transition-colors" />
+                </a>
               </div>
             </div>
             <div>
