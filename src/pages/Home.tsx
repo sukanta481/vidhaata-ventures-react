@@ -32,10 +32,12 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await api.listProperties({ limit: '12' })
-        const liveProperties = Array.isArray(response?.properties) ? response.properties : []
-        setFeatured(liveProperties.filter((property: Property) => property.is_featured === 1).slice(0, 2))
-        setRecent(liveProperties.slice(0, 8))
+        const [featuredRes, recentRes] = await Promise.all([
+          api.listProperties({ featured: '1', limit: '2' }),
+          api.listProperties({ limit: '8' })
+        ])
+        setFeatured(Array.isArray(featuredRes?.properties) ? featuredRes.properties : [])
+        setRecent(Array.isArray(recentRes?.properties) ? recentRes.properties : [])
       } catch (e) {
         console.error(e)
       } finally {

@@ -87,6 +87,7 @@ type FormState = {
   specialFeatures: string[]
   description: string
   videoTourUrl: string
+  isFeatured: boolean
 }
 
 const PROPERTY_GROUP_OPTIONS: { value: PropertyGroup; label: string }[] = [
@@ -184,6 +185,7 @@ const defaultFormState: FormState = {
   specialFeatures: [],
   description: '',
   videoTourUrl: '',
+  isFeatured: false,
 }
 
 function SectionBlock({
@@ -480,7 +482,8 @@ export default function CrmPropertyCreate() {
           configuration: metadata['configuration'] || (property.bedrooms ? `${property.bedrooms} BHK` : '2 BHK'),
           constructionStatus: (metadata['construction status']?.toLowerCase().replace(' ', '_') as 'ready_to_move'|'under_construction') || 'ready_to_move',
           videoTourUrl: metadata['video tour'] || '',
-          specialFeatures: property.amenities || []
+          specialFeatures: property.amenities || [],
+          isFeatured: property.is_featured == 1 || property.isFeatured == 1
         }
         
         if (property.featured_image) {
@@ -582,7 +585,7 @@ export default function CrmPropertyCreate() {
     multipart.append('bathrooms', form.bathrooms || '0')
     multipart.append('squareFeet', visibility.showLandFields ? form.totalArea : form.builtUpArea)
     multipart.append('isPublished', '1')
-    multipart.append('isFeatured', '0')
+    multipart.append('isFeatured', form.isFeatured ? '1' : '0')
 
     if (visibility.showTransactionType) multipart.append('transactionType', form.transactionType)
     if (visibility.showBuildingType) multipart.append('buildingType', form.buildingType)
@@ -1384,6 +1387,17 @@ export default function CrmPropertyCreate() {
             </CardHeader>
             <CardContent className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="space-y-1 text-sm">
+                <div className="flex items-center gap-3 mb-3 bg-emerald-50 border border-emerald-100 p-3 rounded-xl w-max">
+                  <Switch 
+                    checked={form.isFeatured} 
+                    onCheckedChange={(checked) => setField('isFeatured', checked)} 
+                    id="is-featured"
+                  />
+                  <div>
+                    <Label htmlFor="is-featured" className="font-semibold text-emerald-800 cursor-pointer block">Featured Property</Label>
+                    <span className="text-xs text-emerald-600">This property will appear on the homepage.</span>
+                  </div>
+                </div>
                 <p className={`font-medium ${saveState === 'error' ? 'text-red-600' : saveState === 'success' ? 'text-emerald-700' : 'text-slate-700'}`}>
                   {saveState === 'saving' ? 'Saving in progress...' : saveMessage}
                 </p>
