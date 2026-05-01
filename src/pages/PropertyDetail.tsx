@@ -139,6 +139,8 @@ export default function PropertyDetail() {
       { label: 'Balconies', value: metadata.balconies || 'Not specified' },
       { label: 'Listing Purpose', value: metadata['listing purpose'] || 'Not specified' },
       { label: 'Property Group', value: metadata['property group'] || 'Residential' },
+      { label: 'Parking', value: metadata.parking || 'Not specified' },
+      { label: 'Tenant Preference', value: metadata['tenant preference'] || 'Not applicable' },
     ]
   }, [parsedDescription.metadata, property?.bedrooms])
 
@@ -151,6 +153,7 @@ export default function PropertyDetail() {
       { label: 'Transaction Type', value: metadata['transaction type'] || 'Not specified' },
       { label: 'Construction Status', value: metadata['construction status'] || 'Not specified' },
       { label: 'Listing Purpose', value: metadata['listing purpose'] || 'Not specified' },
+      { label: 'Parking', value: metadata.parking || 'Not specified' },
     ]
   }, [parsedDescription.metadata, property?.bathrooms])
 

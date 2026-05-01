@@ -71,7 +71,7 @@ type FormState = {
   constructionStatus: 'ready_to_move' | 'under_construction'
   expectedMonthlyRent: string
   securityDeposit: string
-  tenantPreference: 'families' | 'bachelors' | 'company_lease'
+  tenantPreference: 'families' | 'bachelors' | 'company_lease' | 'both'
   monthlyRentPerBed: string
   totalPrice: string
   preLeasedProperty: boolean
@@ -83,7 +83,7 @@ type FormState = {
   lockInPeriodUnit: 'months' | 'years'
   revenueShareModel: boolean
   furnishing: 'fully_furnished' | 'semi_furnished' | 'unfurnished'
-  parking: 'open' | 'covered'
+  parking: 'open' | 'covered' | 'none'
   specialFeatures: string[]
   description: string
   videoTourUrl: string
@@ -136,8 +136,8 @@ const defaultFormState: FormState = {
   privateGarden: false,
   privateTerrace: false,
   address: '',
-  city: '',
-  state: '',
+  city: 'Kolkata',
+  state: 'West Bengal',
   pincode: '',
   floorNumber: '',
   totalFloors: '',
@@ -169,7 +169,7 @@ const defaultFormState: FormState = {
   constructionStatus: 'ready_to_move',
   expectedMonthlyRent: '',
   securityDeposit: '',
-  tenantPreference: 'families',
+  tenantPreference: 'both',
   monthlyRentPerBed: '',
   totalPrice: '',
   preLeasedProperty: false,
@@ -375,6 +375,8 @@ function buildDescription(form: FormState, visibility: Record<string, boolean>) 
     summary.push(`Balconies: ${form.balconies || '0'}`)
   }
 
+  summary.push(`Parking: ${form.parking.replace('_', ' ')}`)
+
   if (visibility.showCommercialDimensions) {
     summary.push(`Washrooms: ${form.washroomsType}`)
     summary.push(`Commercial Furnishing: ${form.commercialFurnishingStatus.replaceAll('_', ' ')}`)
@@ -395,6 +397,10 @@ function buildDescription(form: FormState, visibility: Record<string, boolean>) 
 
   if (form.videoTourUrl) {
     summary.push(`Video Tour: ${form.videoTourUrl}`)
+  }
+
+  if (visibility.showResidentialRentFinancials) {
+    summary.push(`Tenant Preference: ${form.tenantPreference.replace('_', ' ')}`)
   }
 
   const intro = form.description.trim() || 'Property added from CRM admin panel.'
@@ -1146,7 +1152,9 @@ export default function CrmPropertyCreate() {
                     { value: 'families', label: 'Families' },
                     { value: 'bachelors', label: 'Bachelors' },
                     { value: 'company_lease', label: 'Company Lease' },
+                    { value: 'both', label: 'Both' },
                   ]}
+                  columns={2}
                 />
               </FieldGroup>
             </div>
@@ -1263,8 +1271,9 @@ export default function CrmPropertyCreate() {
                 options={[
                   { value: 'open', label: 'Open' },
                   { value: 'covered', label: 'Covered' },
+                  { value: 'none', label: 'No Parking' },
                 ]}
-                columns={2}
+                columns={3}
               />
             </FieldGroup>
           </div>

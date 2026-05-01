@@ -33,7 +33,7 @@ export default function Home() {
     const fetchData = async () => {
       try {
         const [featuredRes, recentRes] = await Promise.all([
-          api.listProperties({ featured: '1', limit: '2' }),
+          api.listProperties({ featured: '1', limit: '4' }),
           api.listProperties({ limit: '8' })
         ])
         setFeatured(Array.isArray(featuredRes?.properties) ? featuredRes.properties : [])
@@ -120,13 +120,13 @@ export default function Home() {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[1, 2].map(i => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map(i => (
                 <div key={i} className="h-80 bg-slate-200 animate-pulse rounded-xl" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featured.map(property => (
                 <Link key={property.id} to={`/properties/${property.id}`}>
                   <Card className="overflow-hidden group hover:shadow-lg transition-shadow">
