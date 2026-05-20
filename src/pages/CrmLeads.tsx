@@ -74,6 +74,33 @@ const LEAD_SOURCE_FILTER_OPTIONS = [
   { value: 'walk_in', label: 'Walk-in' },
 ] as const
 
+const PIPELINE_STATUS_CONFIG: Record<string, { label: string; dot: string; bg: string; text: string }> = {
+  new:          { label: 'New',         dot: '#3b82f6', bg: '#eff6ff', text: '#1d4ed8' },
+  contacted:    { label: 'Contacted',   dot: '#eab308', bg: '#fefce8', text: '#854d0e' },
+  qualified:    { label: 'Qualified',   dot: '#a855f7', bg: '#faf5ff', text: '#7e22ce' },
+  proposal:     { label: 'Proposal',    dot: '#f97316', bg: '#fff7ed', text: '#9a3412' },
+  visit:        { label: 'Visit',       dot: '#14b8a6', bg: '#f0fdfa', text: '#0f766e' },
+  negotiation:  { label: 'Negotiation', dot: '#ec4899', bg: '#fdf2f8', text: '#9d174d' },
+  closed_won:   { label: 'Won',         dot: '#10b981', bg: '#ecfdf5', text: '#065f46' },
+  closed_lost:  { label: 'Lost',        dot: '#ef4444', bg: '#fef2f2', text: '#991b1b' },
+}
+
+function PipelineStatusBadge({ status }: { status: string }) {
+  const cfg = PIPELINE_STATUS_CONFIG[status] ?? { label: status || 'Unknown', dot: '#94a3b8', bg: '#f1f5f9', text: '#475569' }
+  return (
+    <span
+      style={{ background: cfg.bg, color: cfg.text }}
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold capitalize"
+    >
+      <span
+        style={{ background: cfg.dot }}
+        className="h-2 w-2 rounded-full flex-shrink-0"
+      />
+      {cfg.label}
+    </span>
+  )
+}
+
 function formatLeadDate(date: string) {
   const parsed = new Date(date)
   if (Number.isNaN(parsed.getTime())) return date
@@ -133,6 +160,7 @@ export default function CrmLeads() {
       const response = await api.listLeads(params)
       setLeads(Array.isArray(response?.leads) ? response.leads.map((lead: Lead) => ({
         ...lead,
+        status: lead.status || 'new',
         activities: Array.isArray(lead.activities) ? lead.activities : [],
       })) : [])
     } catch (error) {
@@ -207,11 +235,13 @@ export default function CrmLeads() {
       const details = await api.getLead(lead.id)
       const hydratedLead = {
         ...details,
+        // Prefer the status from the passed lead if DB returns empty (handles optimistic update timing)
+        status: details.status || lead.status || 'new',
         activities: Array.isArray(details.activities) ? details.activities : [],
       }
       setSelectedLead(hydratedLead)
       setFollowUpForm({
-        status: hydratedLead.status,
+        status: hydratedLead.status || 'new',
         notes: '',
         followUpDate: '',
         propertyInterestId: hydratedLead.property_interest_id ? String(hydratedLead.property_interest_id) : 'none',
@@ -273,8 +303,19 @@ export default function CrmLeads() {
         propertyInterestId: nextPropertyId,
       })
 
-      await loadLeads(true)
-      await openLeadDetails({ ...selectedLead })
+      // Optimistically update the lead status in the table immediately
+      const newStatus = followUpForm.status
+      setLeads((prev) =>
+        prev.map((l) =>
+          l.id === selectedLead.id ? { ...l, status: newStatus, property_interest_id: nextPropertyId } : l
+        )
+      )
+      // Also update selectedLead so the dialog header badge refreshes
+      setSelectedLead((prev) => prev ? { ...prev, status: newStatus } : prev)
+
+      // Refresh from server in background
+      void loadLeads(true)
+      await openLeadDetails({ ...selectedLead, status: newStatus })
       toast.success('Lead follow-up updated')
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to update lead follow-up')
@@ -522,7 +563,7 @@ export default function CrmLeads() {
                       </td>
                       <td className="p-4 text-sm text-slate-600">{lead.property_title || 'General enquiry'}</td>
                       <td className="p-4">
-                        <Badge className={getStatusBadge(lead.status)}>{lead.status.replace('_', ' ')}</Badge>
+                        <PipelineStatusBadge status={lead.status} />
                         <button
                           type="button"
                           onClick={() => void openLeadDetails(lead)}
