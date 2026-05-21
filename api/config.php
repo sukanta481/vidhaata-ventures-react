@@ -1,5 +1,6 @@
 <?php
 // EstateFlow API Configuration
+date_default_timezone_set('Asia/Kolkata');
 ini_set('display_errors', '0');
 ini_set('html_errors', '0');
 error_reporting(E_ALL);
@@ -61,6 +62,7 @@ function getDB() {
         ];
         try {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+            $pdo->exec("SET time_zone = '+05:30'");
         } catch (PDOException $e) {
             jsonResponse(['error' => 'Database connection failed: ' . $e->getMessage()], 500);
         }

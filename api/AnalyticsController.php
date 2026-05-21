@@ -68,7 +68,7 @@ class AnalyticsController {
         // Today's scheduled visits (follow_up_date = today)
         $todayVisits = 0;
         try {
-            $stmt = $db->query("SELECT COUNT(*) as count FROM lead_activities WHERE activity_type = 'meeting' AND follow_up_date IS NOT NULL AND DATE(follow_up_date) = CURDATE()");
+            $stmt = $db->query("SELECT COUNT(DISTINCT lead_id) as count FROM lead_activities WHERE activity_type = 'meeting' AND follow_up_date IS NOT NULL AND DATE(follow_up_date) = CURDATE()");
             $todayVisits = (int)($stmt->fetch()['count'] ?? 0);
         } catch (\Exception $e) {
             // column may still not exist — leave count as 0
