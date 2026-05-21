@@ -283,6 +283,7 @@ export default function CrmLeads() {
     try {
       const nextPropertyId = followUpForm.propertyInterestId === 'none' ? null : Number(followUpForm.propertyInterestId)
 
+      // 1. Update the lead status
       await api.updateLead(selectedLead.id, {
         firstName: selectedLead.first_name,
         lastName: selectedLead.last_name,
@@ -296,6 +297,7 @@ export default function CrmLeads() {
         notes: selectedLead.notes || '',
       })
 
+      // 2. Add the activity
       await api.addLeadActivity(selectedLead.id, {
         activityType: followUpForm.status === 'visit' ? 'meeting' : 'status_change',
         description: followUpForm.notes,
@@ -303,19 +305,24 @@ export default function CrmLeads() {
         propertyInterestId: nextPropertyId,
       })
 
-      // Optimistically update the lead status in the table immediately
-      const newStatus = followUpForm.status
-      setLeads((prev) =>
-        prev.map((l) =>
-          l.id === selectedLead.id ? { ...l, status: newStatus, property_interest_id: nextPropertyId } : l
-        )
-      )
-      // Also update selectedLead so the dialog header badge refreshes
-      setSelectedLead((prev) => prev ? { ...prev, status: newStatus } : prev)
+      // 3. Refresh the leads list from DB (sequential, no race)
+      await loadLeads(true)
 
-      // Refresh from server in background
-      void loadLeads(true)
-      await openLeadDetails({ ...selectedLead, status: newStatus })
+      // 4. Reopen lead details to show fresh data
+      const freshDetails = await api.getLead(selectedLead.id)
+      const freshLead = {
+        ...freshDetails,
+        status: freshDetails.status || followUpForm.status || 'new',
+        activities: Array.isArray(freshDetails.activities) ? freshDetails.activities : [],
+      }
+      setSelectedLead(freshLead)
+      setFollowUpForm({
+        status: freshLead.status,
+        notes: '',
+        followUpDate: '',
+        propertyInterestId: freshLead.property_interest_id ? String(freshLead.property_interest_id) : 'none',
+      })
+
       toast.success('Lead follow-up updated')
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to update lead follow-up')
