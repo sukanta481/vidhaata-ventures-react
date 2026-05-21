@@ -138,6 +138,7 @@ class PropertyController {
             'images' => $images,
             'amenities' => $amenities,
             'isFeatured' => $this->boolValue($data['isFeatured'] ?? 0),
+            'isNewlyLaunched' => $this->boolValue($data['isNewlyLaunched'] ?? 0),
             'isPublished' => $this->boolValue($data['isPublished'] ?? 1),
         ];
     }
@@ -151,6 +152,7 @@ class PropertyController {
         $minPrice = $_GET['minPrice'] ?? null;
         $maxPrice = $_GET['maxPrice'] ?? null;
         $featured = $_GET['featured'] ?? null;
+        $newlyLaunched = $_GET['newlyLaunched'] ?? null;
         $search = $_GET['search'] ?? null;
         $limit = (int)($_GET['limit'] ?? 20);
         $offset = (int)($_GET['offset'] ?? 0);
@@ -180,6 +182,9 @@ class PropertyController {
         }
         if ($featured) {
             $where[] = "is_featured = 1";
+        }
+        if ($newlyLaunched) {
+            $where[] = "is_newly_launched = 1";
         }
         if ($search) {
             $where[] = "(title LIKE ? OR description LIKE ? OR city LIKE ? OR address LIKE ?)";
@@ -246,8 +251,8 @@ class PropertyController {
         $stmt = $db->prepare("INSERT INTO properties 
             (title, description, property_type, status, price, bedrooms, bathrooms, square_feet, 
              address, city, state, zip_code, country, latitude, longitude, featured_image, images, amenities, 
-             agent_id, is_featured, is_published)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+             agent_id, is_featured, is_newly_launched, is_published)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         
         $stmt->execute([
             $payload['title'],
@@ -270,6 +275,7 @@ class PropertyController {
             json_encode($payload['amenities']),
             $user['sub'],
             $payload['isFeatured'],
+            $payload['isNewlyLaunched'],
             $payload['isPublished']
         ]);
         
@@ -295,7 +301,7 @@ class PropertyController {
             title = ?, description = ?, property_type = ?, status = ?, price = ?, bedrooms = ?, 
             bathrooms = ?, square_feet = ?, address = ?, city = ?, state = ?, zip_code = ?, 
             country = ?, latitude = ?, longitude = ?, featured_image = ?, images = ?, amenities = ?, 
-            is_featured = ?, is_published = ? WHERE id = ?");
+            is_featured = ?, is_newly_launched = ?, is_published = ? WHERE id = ?");
         
         $stmt->execute([
             $payload['title'],
@@ -317,6 +323,7 @@ class PropertyController {
             json_encode($payload['images']),
             json_encode($payload['amenities']),
             $payload['isFeatured'],
+            $payload['isNewlyLaunched'],
             $payload['isPublished'],
             $id
         ]);

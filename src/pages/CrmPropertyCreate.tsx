@@ -88,6 +88,7 @@ type FormState = {
   description: string
   videoTourUrl: string
   isFeatured: boolean
+  isNewlyLaunched: boolean
 }
 
 const PROPERTY_GROUP_OPTIONS: { value: PropertyGroup; label: string }[] = [
@@ -186,6 +187,7 @@ const defaultFormState: FormState = {
   description: '',
   videoTourUrl: '',
   isFeatured: false,
+  isNewlyLaunched: false,
 }
 
 function SectionBlock({
@@ -489,7 +491,8 @@ export default function CrmPropertyCreate() {
           constructionStatus: (metadata['construction status']?.toLowerCase().replace(' ', '_') as 'ready_to_move'|'under_construction') || 'ready_to_move',
           videoTourUrl: metadata['video tour'] || '',
           specialFeatures: property.amenities || [],
-          isFeatured: property.is_featured == 1 || property.isFeatured == 1
+          isFeatured: property.is_featured == 1 || property.isFeatured == 1,
+          isNewlyLaunched: property.is_newly_launched == 1 || property.isNewlyLaunched == 1
         }
         
         if (property.featured_image) {
@@ -592,6 +595,7 @@ export default function CrmPropertyCreate() {
     multipart.append('squareFeet', visibility.showLandFields ? form.totalArea : form.builtUpArea)
     multipart.append('isPublished', '1')
     multipart.append('isFeatured', form.isFeatured ? '1' : '0')
+    multipart.append('isNewlyLaunched', form.isNewlyLaunched ? '1' : '0')
 
     if (visibility.showTransactionType) multipart.append('transactionType', form.transactionType)
     if (visibility.showBuildingType) multipart.append('buildingType', form.buildingType)
@@ -1405,6 +1409,17 @@ export default function CrmPropertyCreate() {
                   <div>
                     <Label htmlFor="is-featured" className="font-semibold text-emerald-800 cursor-pointer block">Featured Property</Label>
                     <span className="text-xs text-emerald-600">This property will appear on the homepage.</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 mb-3 bg-blue-50 border border-blue-100 p-3 rounded-xl w-max">
+                  <Switch 
+                    checked={form.isNewlyLaunched} 
+                    onCheckedChange={(checked) => setField('isNewlyLaunched', checked)} 
+                    id="is-newly-launched"
+                  />
+                  <div>
+                    <Label htmlFor="is-newly-launched" className="font-semibold text-blue-800 cursor-pointer block">Newly Launched</Label>
+                    <span className="text-xs text-blue-600">Show this property in the newly launched section.</span>
                   </div>
                 </div>
                 <p className={`font-medium ${saveState === 'error' ? 'text-red-600' : saveState === 'success' ? 'text-emerald-700' : 'text-slate-700'}`}>

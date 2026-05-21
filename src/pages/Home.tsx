@@ -27,17 +27,20 @@ interface Property {
 export default function Home() {
   const [featured, setFeatured] = useState<Property[]>([])
   const [recent, setRecent] = useState<Property[]>([])
+  const [newlyLaunched, setNewlyLaunched] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [featuredRes, recentRes] = await Promise.all([
+        const [featuredRes, recentRes, newlyLaunchedRes] = await Promise.all([
           api.listProperties({ featured: '1', limit: '4' }),
-          api.listProperties({ limit: '8' })
+          api.listProperties({ limit: '8' }),
+          api.listProperties({ newlyLaunched: '1', limit: '4' })
         ])
         setFeatured(Array.isArray(featuredRes?.properties) ? featuredRes.properties : [])
         setRecent(Array.isArray(recentRes?.properties) ? recentRes.properties : [])
+        setNewlyLaunched(Array.isArray(newlyLaunchedRes?.properties) ? newlyLaunchedRes.properties : [])
       } catch (e) {
         console.error(e)
       } finally {
@@ -200,6 +203,56 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Newly Launched Projects */}
+      {newlyLaunched.length > 0 && (
+        <section className="py-16 bg-blue-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-slate-900">Newly Launched Projects</h2>
+                <p className="text-slate-500 mt-1">Discover the latest and most exciting property launches</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {newlyLaunched.map(property => (
+                <Link key={property.id} to={`/properties/${property.id}`}>
+                  <Card className="overflow-hidden group hover:shadow-lg transition-shadow border-blue-100">
+                    <div className="relative h-64 overflow-hidden">
+                      <img
+                        src={property.featured_image || property.images[0] || '/images/hero-bg.jpg'}
+                        alt={property.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-4 left-4 flex gap-2">
+                        <Badge className="bg-blue-600">New Launch</Badge>
+                        <Badge variant="secondary" className="capitalize">{property.status.replace('_', ' ')}</Badge>
+                      </div>
+                      <div className="absolute bottom-4 right-4">
+                        <Badge variant="secondary" className="text-lg font-semibold bg-white text-slate-900 border-none shadow-sm">
+                          {formatINR(property.price, property.status)}
+                        </Badge>
+                      </div>
+                    </div>
+                    <CardContent className="p-5 bg-white">
+                      <h3 className="text-xl font-semibold text-slate-900 mb-2 truncate">{property.title}</h3>
+                      <div className="flex items-center gap-1 text-slate-500 text-sm mb-3">
+                        <MapPin className="h-4 w-4" />
+                        {property.city}, {property.state}
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-slate-600">
+                        <span className="flex items-center gap-1"><Bed className="h-4 w-4" /> {property.bedrooms}</span>
+                        <span className="flex items-center gap-1"><Bath className="h-4 w-4" /> {formatBathrooms(property.bathrooms)}</span>
+                        <span className="flex items-center gap-1"><Square className="h-4 w-4" /> {property.square_feet?.toLocaleString()} sqft</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Why Choose Us */}
       <section className="py-16 bg-slate-900 text-white">
